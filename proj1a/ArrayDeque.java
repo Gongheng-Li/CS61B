@@ -20,9 +20,8 @@ public class ArrayDeque<T> {
 
     private void resize(int capacity){
         T[] new_items = (T[]) new Object[capacity];
-        if(front_ptr < end_ptr){
+        if(front_ptr < end_ptr)
             System.arraycopy(items, front_ptr, new_items, 0, end_ptr-front_ptr);
-        }
         else{
             System.arraycopy(items, front_ptr, new_items, 0, items.length-front_ptr);
             System.arraycopy(items, 0, new_items, items.length-front_ptr, end_ptr);
@@ -66,12 +65,10 @@ public class ArrayDeque<T> {
             }
             size -= 1;
             double usage_factor = (size * 1.0) / items.length;
-            if (usage_factor <= 0.25 && items.length >= 16) {
+            if (usage_factor <= 0.25 && items.length >= 16)
                 resize(items.length / 2);
-            }
             return item;
-        }
-        else{
+        } else{
             System.out.println("No more element to remove!");
             return null;
         }
@@ -79,20 +76,18 @@ public class ArrayDeque<T> {
 
     public T removeLast(){
         if(size > 0) {
-            T item = items[end_ptr - 1];
-            items[end_ptr - 1] = null;
             end_ptr -= 1;
             if (end_ptr < 0) {
                 end_ptr += items.length;
             }
+            T item = items[end_ptr];
+            items[end_ptr] = null;
             size -= 1;
             double usage_factor = (size * 1.0) / items.length;
-            if (usage_factor <= 0.25 && items.length >= 16) {
+            if (usage_factor <= 0.25 && items.length >= 16)
                 resize(items.length / 2);
-            }
             return item;
-        }
-        else{
+        } else{
             System.out.println("No more element to remove!");
             return null;
         }

@@ -50,8 +50,7 @@ public class LinkedListDeque<T> {
             sentinel.next.prev = sentinel;
             size -= 1;
             return temp;
-        }
-        else{
+        } else{
             System.out.println("No more element to remove!");
             return null;
         }
@@ -70,8 +69,7 @@ public class LinkedListDeque<T> {
             sentinel.prev.next = sentinel;
             size -= 1;
             return temp;
-        }
-        else{
+        } else{
             System.out.println("No more element to remove!");
             return null;
         }

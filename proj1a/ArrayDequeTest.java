@@ -17,9 +17,8 @@ public class ArrayDequeTest{
     }
 
     public static void printTestStatus(boolean passed){
-        if(passed){
+        if(passed)
             System.out.println("Test passed!");
-        }
         else{
             System.out.println("Test failed.");
         }
