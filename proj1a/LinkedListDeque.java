@@ -1,21 +1,21 @@
 /**
  * Double ended link list class.
- * @param <datatype> type of item in the link list
+ * @param <T> type of item in the link list
  * @author Li Gongheng
  */
 
-public class LinkedListDeque<datatype>{
+public class LinkedListDeque<T> {
     private int size;
     private Node sentinel;
 
     private class Node{
         public Node prev;
-        public datatype item;
+        public T item;
         public Node next;
 
         public Node(){}
 
-        public Node(Node previous_node, datatype node_item, Node next_node){
+        public Node(Node previous_node, T node_item, Node next_node){
             prev = previous_node;
             item = node_item;
             next = next_node;
@@ -37,35 +37,47 @@ public class LinkedListDeque<datatype>{
         return size == 0;
     }
 
-    public void addFirst(datatype x){
+    public void addFirst(T x){
         sentinel.next = new Node(sentinel, x, sentinel.next);
         sentinel.next.next.prev = sentinel.next;
         size += 1;
     }
 
-    public datatype removeFirst(){
-        datatype temp = sentinel.next.item;
-        sentinel.next = sentinel.next.next;
-        sentinel.next.prev = sentinel;
-        size -= 1;
-        return temp;
+    public T removeFirst(){
+        if(size > 0) {
+            T temp = sentinel.next.item;
+            sentinel.next = sentinel.next.next;
+            sentinel.next.prev = sentinel;
+            size -= 1;
+            return temp;
+        }
+        else{
+            System.out.println("No more element to remove!");
+            return null;
+        }
     }
 
-    public void addLast(datatype x){
+    public void addLast(T x){
         sentinel.prev = new Node(sentinel.prev, x, sentinel);
         sentinel.prev.prev.next = sentinel.prev;
         size += 1;
     }
 
-    public datatype removeLast(){
-        datatype temp = sentinel.prev.item;
-        sentinel.prev = sentinel.prev.prev;
-        sentinel.prev.next = sentinel;
-        size -= 1;
-        return temp;
+    public T removeLast(){
+        if(size > 0) {
+            T temp = sentinel.prev.item;
+            sentinel.prev = sentinel.prev.prev;
+            sentinel.prev.next = sentinel;
+            size -= 1;
+            return temp;
+        }
+        else{
+            System.out.println("No more element to remove!");
+            return null;
+        }
     }
 
-    public datatype get(int index){
+    public T get(int index){
         Node p = sentinel.next;
         while(index != 0){
             p = p.next;
@@ -74,14 +86,14 @@ public class LinkedListDeque<datatype>{
         return p.item;
     }
 
-    private datatype getRecursiveFromNode(int index, Node n){
+    private T getRecursiveFromNode(int index, Node n){
         if(index == 0){
             return n.item;
         }
         return getRecursiveFromNode(index-1, n.next);
     }
 
-    public datatype getRecursive(int index){
+    public T getRecursive(int index){
         return getRecursiveFromNode(index, sentinel.next);
     }
 
