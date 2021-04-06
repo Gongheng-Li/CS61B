@@ -31,7 +31,10 @@ public class Percolation {
 
     public void open(int row, int col) {
         checkValidation(row, col);
-        grid[row][col] = OPEN;
+        if (grid[row][col] == BLOCKED) {
+            grid[row][col] = OPEN;
+            numberOfOpenSites += 1;
+        }
         if (col != 0) {
             adjacentUnion(row, col, 0, -1);
         }
@@ -55,7 +58,6 @@ public class Percolation {
         if (checkFull[disjointSet.find(row*grid[0].length+col)] == 3) {
             percolationFlag = true;
         }
-        numberOfOpenSites += 1;
     }
 
     private void adjacentUnion(int row, int col, int deltaRow, int deltaCol) {
