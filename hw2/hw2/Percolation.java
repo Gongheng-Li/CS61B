@@ -7,9 +7,9 @@ public class Percolation {
     private static final int OPEN = 1;
 
     private int[][] grid;
-    private WeightedQuickUnionUF DisjointSet;
+    private WeightedQuickUnionUF disjointSet;
     private int numberOfOpenSites;
-    private boolean[] checkFull;
+    private int[] checkFull;
     private boolean percolationFlag;
 
     public Percolation(int N) {
@@ -17,8 +17,8 @@ public class Percolation {
             throw new IllegalArgumentException("Size of the gird cannot be negative!");
         }
         grid = new int[N][N];
-        DisjointSet = new WeightedQuickUnionUF(N*N);
-        checkFull = new boolean[N*N];
+        disjointSet = new WeightedQuickUnionUF(N*N);
+        checkFull = new int[N*N];
         numberOfOpenSites = 0;
         percolationFlag = false;
 
@@ -32,32 +32,45 @@ public class Percolation {
     public void open(int row, int col) {
         checkValidation(row, col);
         grid[row][col] = OPEN;
-        if (row == 0) {
-            checkFull[DisjointSet.find(col)] = true;
-        } else {
-            adjacentUnion(row, col, -1, 0);
-        }
-        if (row == grid.length-1) {
-            if (checkFull[DisjointSet.find(row*grid[0].length+col)]) {
-                percolationFlag = true;
-            }
-        } else {
-            adjacentUnion(row, col, 1, 0);
-        }
         if (col != 0) {
             adjacentUnion(row, col, 0, -1);
         }
         if (col != grid[0].length-1) {
             adjacentUnion(row, col, 0, 1);
         }
+        if (row == 0) {
+            if (checkFull[disjointSet.find(col)] < 2) {
+                checkFull[disjointSet.find(col)] += 2;
+            }
+        } else {
+            adjacentUnion(row, col, -1, 0);
+        }
+        if (row == grid.length-1) {
+            if (checkFull[disjointSet.find(row*grid[0].length+col)] == 0 || checkFull[disjointSet.find(row*grid[0].length+col)] == 2) {
+                checkFull[disjointSet.find(row * grid[0].length + col)] += 1;
+            }
+        } else {
+            adjacentUnion(row, col, 1, 0);
+        }
+        if (checkFull[disjointSet.find(row*grid[0].length+col)] == 3) {
+            percolationFlag = true;
+        }
         numberOfOpenSites += 1;
     }
 
     private void adjacentUnion(int row, int col, int deltaRow, int deltaCol) {
         if (grid[row+deltaRow][col+deltaCol] == OPEN) {
-            boolean isFullAfterUnion = checkFull[DisjointSet.find(row * grid[0].length + col)] || checkFull[DisjointSet.find((row + deltaRow) * grid[0].length + (col + deltaCol))];
-            DisjointSet.union(row * grid[0].length + col, (row + deltaRow) * grid[0].length + (col + deltaCol));
-            checkFull[DisjointSet.find(row * grid[0].length + col)] = isFullAfterUnion;
+            int index = row * grid[0].length + col;
+            int indexDelta = (row + deltaRow) * grid[0].length + (col + deltaCol);
+            int isFullAfterUnion = 0;
+            if (checkFull[disjointSet.find(index)] >=2 || checkFull[disjointSet.find(indexDelta)] >= 2) {
+                isFullAfterUnion += 2;
+            }
+            if (checkFull[disjointSet.find(index)] % 2 == 1 || checkFull[disjointSet.find(indexDelta)] % 2 == 1) {
+                isFullAfterUnion += 1;
+            }
+            disjointSet.union(row * grid[0].length + col, (row + deltaRow) * grid[0].length + (col + deltaCol));
+            checkFull[disjointSet.find(row * grid[0].length + col)] = isFullAfterUnion;
         }
     }
 
@@ -68,7 +81,7 @@ public class Percolation {
 
     public boolean isFull(int row, int col) {
         checkValidation(row, col);
-        return checkFull[DisjointSet.find(row*grid[0].length + col)];
+        return checkFull[disjointSet.find(row*grid[0].length + col)] >= 2;
     }
 
     public int numberOfOpenSites() {
