@@ -1,5 +1,6 @@
 package lab9;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -7,7 +8,7 @@ import java.util.Set;
  *  A hash table-backed Map implementation. Provides amortized constant time
  *  access to elements via get(), remove(), and put() in the best case.
  *
- *  @author Your name here
+ *  @author Li Gongheng
  */
 public class MyHashMap<K, V> implements Map61B<K, V> {
 
@@ -53,19 +54,39 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      */
     @Override
     public V get(K key) {
-        throw new UnsupportedOperationException();
+        return buckets[hash(key)].get(key);
     }
 
     /* Associates the specified value with the specified key in this map. */
     @Override
     public void put(K key, V value) {
-        throw new UnsupportedOperationException();
+        Map61B<K, V> mapToAdd = buckets[hash(key)];
+        if (!mapToAdd.containsKey(key)) {
+            size += 1;
+        }
+        mapToAdd.put(key, value);
+        if (loadFactor() > MAX_LF) {
+            resize(2 * buckets.length);
+        }
+    }
+
+    private void resize(int capacity) {
+        ArrayMap<K, V>[] tempMap = buckets;
+        buckets = new ArrayMap[capacity];
+        for (int i = 0; i < buckets.length; i++) {
+            buckets[i] = new ArrayMap<>();
+        }
+        for (ArrayMap<K, V> bucket : tempMap) {
+            for (K key : bucket) {
+                buckets[hash(key)].put(key, bucket.get(key));
+            }
+        }
     }
 
     /* Returns the number of key-value mappings in this map. */
     @Override
     public int size() {
-        throw new UnsupportedOperationException();
+        return size;
     }
 
     //////////////// EVERYTHING BELOW THIS LINE IS OPTIONAL ////////////////
@@ -73,7 +94,13 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     /* Returns a Set view of the keys contained in this map. */
     @Override
     public Set<K> keySet() {
-        throw new UnsupportedOperationException();
+        Set<K> keySet = new HashSet<>();
+        for (ArrayMap<K, V> bucket : buckets) {
+            for (K key : bucket) {
+                keySet.add(key);
+            }
+        }
+        return keySet;
     }
 
     /* Removes the mapping for the specified key from this map if exists.
@@ -81,7 +108,13 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * UnsupportedOperationException. */
     @Override
     public V remove(K key) {
-        throw new UnsupportedOperationException();
+        Map61B<K, V> targetMap = buckets[hash(key)];
+        if (targetMap.containsKey(key)) {
+            size -= 1;
+            return targetMap.remove(key);
+        } else {
+            return null;
+        }
     }
 
     /* Removes the entry for the specified key only if it is currently mapped to
@@ -89,11 +122,37 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * throw an UnsupportedOperationException.*/
     @Override
     public V remove(K key, V value) {
-        throw new UnsupportedOperationException();
+        Map61B<K, V> targetMap = buckets[hash(key)];
+        if (targetMap.containsKey(key)) {
+            size -= 1;
+            return targetMap.remove(key, value);
+        } else {
+            return null;
+        }
     }
 
     @Override
     public Iterator<K> iterator() {
-        throw new UnsupportedOperationException();
+        return keySet().iterator();
+    }
+
+    public static void main(String[] args) {
+        Map61B<String, Integer> testMap = new MyHashMap<>();
+        testMap.put("two", 2);
+        testMap.put("three", 3);
+        testMap.put("Guess what", 0);
+        testMap.put("one", 1);
+        testMap.put("four", 4);
+        testMap.put("yellow", -1);
+        testMap.put("I think that's enough", -2);
+        testMap.put("Capital Two, the last one", 2);
+        Set<String> keySet = testMap.keySet();
+        int zero = testMap.remove("Guess what");
+        boolean checkRemove = testMap.containsKey("Guess what");
+        int three = testMap.remove("three", 3);
+        testMap.remove("three");
+        testMap.remove("two", 5);
+        int two = testMap.remove("two");
+        int negativeTwo = testMap.remove("I think that's enough");
     }
 }
