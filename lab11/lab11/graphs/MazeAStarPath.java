@@ -18,7 +18,7 @@ public class MazeAStarPath extends MazeExplorer {
     private class Comp implements Comparator<Integer> {
         @Override
         public int compare(Integer o1, Integer o2) {
-            return h(o2) - h(o1);
+            return h(o1) - h(o2);
         }
     }
 
