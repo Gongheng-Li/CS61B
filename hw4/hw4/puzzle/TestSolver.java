@@ -62,8 +62,8 @@ public class TestSolver {
         }
     }
 
-/* Uncomment once you've written Solver.
-    @Test(timeout = 10000)
+
+    @Test//(timeout = 10000)
     public void testWordPuzzles() {
         In in = new In("input/word_puzzles.txt");
         while (!in.isEmpty()) {
@@ -79,7 +79,7 @@ public class TestSolver {
             assertEquals(errorMessage, wps.numMoves, s.moves());
         }
     }
- */
+
 
  /* Uncomment everything in this block once you've written Board.
      public static Board readBoard(String filename) {
