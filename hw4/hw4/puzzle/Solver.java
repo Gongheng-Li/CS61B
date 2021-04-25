@@ -6,16 +6,23 @@ import java.util.*;
 
 public class Solver {
     private Stack<WorldState> solutionPath;
-    private Map<WorldState, Integer> distTo;
-    private Map<WorldState, WorldState> edgeTo;
-    private WorldState goalState;
+    private Map<Node, Integer> distTo;
+    private Map<Node, Node> edgeTo;
+    private Node goalNode;
     private int moves;
 
-    private class Comp implements Comparator<WorldState> {
+    private class Comp implements Comparator<Node> {
         @Override
-        public int compare(WorldState state1, WorldState state2) {
-            return (distTo.get(state1) + state1.estimatedDistanceToGoal())
-                    - (distTo.get(state2) + state2.estimatedDistanceToGoal());
+        public int compare(Node state1, Node state2) {
+            return (distTo.get(state1) + state1.world.estimatedDistanceToGoal())
+                    - (distTo.get(state2) + state2.world.estimatedDistanceToGoal());
+        }
+    }
+
+    private class Node {
+        private WorldState world;
+        private Node(WorldState inputWorld) {
+            world = inputWorld;
         }
     }
 
@@ -23,33 +30,32 @@ public class Solver {
         solutionPath = new Stack<>();
         distTo = new HashMap<>();
         edgeTo = new HashMap<>();
-        distTo.put(initial, 0);
-        edgeTo.put(initial, null);
+        Node initialNode = new Node(initial);
+        distTo.put(initialNode, 0);
+        edgeTo.put(initialNode, null);
         Comp comparator = new Comp();
-        MinPQ<WorldState> fringe = new MinPQ<>(comparator);
-        fringe.insert(initial);
+        MinPQ<Node> fringe = new MinPQ<>(comparator);
+        fringe.insert(initialNode);
         while (!fringe.isEmpty()) {
-            WorldState presentState = fringe.delMin();
-            if (presentState.isGoal()) {
-                goalState = presentState;
+            Node presentNode = fringe.delMin();
+            if (presentNode.world.isGoal()) {
+                goalNode = presentNode;
                 break;
             }
-            for (WorldState adjState : presentState.neighbors()) {
-                if (!adjState.equals(edgeTo.get(presentState))) {
-                    if (distTo.containsKey(adjState) && distTo.get(adjState) < distTo.get(presentState) + 1) {
-                        continue;
-                    }
-                    edgeTo.put(adjState, presentState);
-                    distTo.put(adjState, distTo.get(presentState) + 1);
-                    fringe.insert(adjState);
+            for (WorldState adjState : presentNode.world.neighbors()) {
+                if (edgeTo.get(presentNode) == null || !adjState.equals(edgeTo.get(presentNode).world)) {
+                    Node adjNode = new Node(adjState);
+                    edgeTo.put(adjNode, presentNode);
+                    distTo.put(adjNode, distTo.get(presentNode) + 1);
+                    fringe.insert(adjNode);
                 }
             }
         }
-        moves = distTo.get(goalState);
-        WorldState tempState = goalState;
-        while (tempState != null) {
-            solutionPath.push(tempState);
-            tempState = edgeTo.get(tempState);
+        moves = distTo.get(goalNode);
+        Node tempNode = goalNode;
+        while (tempNode != null) {
+            solutionPath.push(tempNode.world);
+            tempNode = edgeTo.get(tempNode);
         }
     }
 
