@@ -78,7 +78,11 @@ public class MergeSort {
             Queue<Item> mergedQueue = mergeSortedQueues(q1, q2);
             queueOfQueues.enqueue(mergedQueue);
         }
-        return queueOfQueues.dequeue();
+        if (queueOfQueues.size() > 0) {
+            return queueOfQueues.dequeue();
+        } else {
+            return new Queue<>();
+        }
     }
 
     public static void main(String[] args) {
