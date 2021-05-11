@@ -16,8 +16,20 @@ public class RadixSort {
      * @return String[] the sorted array
      */
     public static String[] sort(String[] asciis) {
-        // TODO: Implement LSD Sort
-        return null;
+        int maxLength = 0;
+        int i = 0;
+        String[] sorted = new String[asciis.length];
+        for (String str : asciis) {
+            if (str.length() > maxLength) {
+                maxLength = str.length();
+            }
+            sorted[i] = str;
+            i += 1;
+        }
+        for (int index = maxLength - 1; index >= 0; index--) {
+            sortHelperLSD(sorted, index);
+        }
+        return sorted;
     }
 
     /**
@@ -28,7 +40,36 @@ public class RadixSort {
      */
     private static void sortHelperLSD(String[] asciis, int index) {
         // Optional LSD helper method for required LSD radix sort
-        return;
+        int[] counts = new int[257];
+        for (String str : asciis) {
+            if (str.length() <= index) {
+                counts[0] += 1;
+            } else {
+                counts[str.charAt(index) + 1] += 1;
+            }
+        }
+        int[] starts = new int[257];
+        for (int i = 1; i < 257; i++) {
+            starts[i] = starts[i - 1] + counts[i - 1];
+        }
+        String[] sorted = new String[asciis.length];
+        for (String str : asciis) {
+            if (str.length() <= index) {
+                sorted[starts[0]] = str;
+                starts[0] += 1;
+            } else {
+                sorted[starts[str.charAt(index) + 1]] = str;
+                starts[str.charAt(index) + 1] += 1;
+            }
+        }
+        System.arraycopy(sorted, 0, asciis, 0, asciis.length);
+    }
+
+    public static String[] MSDSort(String[] ascii) {
+        String[] sorted = new String[ascii.length];
+        System.arraycopy(ascii, 0, sorted, 0, ascii.length);
+        sortHelperMSD(sorted, 0, sorted.length, 0);
+        return sorted;
     }
 
     /**
@@ -43,6 +84,56 @@ public class RadixSort {
      **/
     private static void sortHelperMSD(String[] asciis, int start, int end, int index) {
         // Optional MSD helper method for optional MSD radix sort
-        return;
+        if (end - start <= 1) {
+            return;
+        }
+        int maxLength = 0;
+        for (int i = start; i < end; i++) {
+            if (asciis[i].length() > maxLength) {
+                maxLength = asciis[i].length();
+            }
+        }
+        if (maxLength <= index) {
+            return;
+        }
+        int[] counts = new int[257];
+        for (int i = start; i < end; i++) {
+            if (asciis[i].length() <= index) {
+                counts[0] += 1;
+            } else {
+                counts[asciis[i].charAt(index) + 1] += 1;
+            }
+        }
+        int[] starts = new int[257];
+        for (int i = 1; i < 257; i++) {
+            starts[i] = starts[i - 1] + counts[i - 1];
+        }
+        String[] sorted = new String[end - start];
+        for (int i = start; i < end; i++) {
+            if (asciis[i].length() <= index) {
+                sorted[starts[0]] = asciis[i];
+                starts[0] += 1;
+            } else {
+                sorted[starts[asciis[i].charAt(index) + 1]] = asciis[i];
+                starts[asciis[i].charAt(index) + 1] += 1;
+            }
+        }
+        for (int i = 0; i < 257; i++) {
+            sortHelperMSD(sorted, starts[i] - counts[i], starts[i], index + 1);
+        }
+        System.arraycopy(sorted, 0, asciis, start, sorted.length);
+    }
+
+    public static void main(String[] args) {
+        String[] testLSDRadixSort = new String[]{"a1b2c3", "ab123c", "ab", "12c3", "ca2b13", "b2c13", "ac2b", "2abc3",
+                                                 "b2c31", "12c3", "ca2b1", "a2b1c", "b2ac", "1cab3", "21bc", "ab23c"};
+        String[] sorted = MSDSort(testLSDRadixSort);
+        for (String str : testLSDRadixSort) {
+            System.out.print(str + " ");
+        }
+        System.out.println();
+        for (String str : sorted) {
+            System.out.print(str + " ");
+        }
     }
 }
